@@ -1,0 +1,9 @@
+services:
+  snmptrapd:
+    image: zabbix/zabbix-snmptraps:latest
+    container_name: snmptrapd
+    ports:
+      - "162:162/udp"
+    volumes:
+      - ./src/test/resources/config/snmptrapd.conf:/etc/snmp/snmptrapd.conf:ro
+    command: ["snmptrapd", "-Lo", "-f", "-n"]
