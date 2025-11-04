@@ -1,0 +1,8 @@
+group: io.kestra.plugin.snmp
+name: "snmp"
+title: "SNMP"
+description: "Tasks to interact with SNMP for network management and monitoring."
+body: ""
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"
