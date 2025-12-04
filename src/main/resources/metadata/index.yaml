@@ -1,8 +1,8 @@
 group: io.kestra.plugin.snmp
 name: "snmp"
 title: "SNMP"
-description: "Tasks to interact with SNMP for network management and monitoring."
-body: ""
+description: "Tasks that send SNMP traps or informs for network monitoring."
+body: "Specify the SNMP version, target host/port, community or security params, and payload OIDs to emit traps or informs to your NMS, enabling Kestra flows to notify external monitoring systems."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"
