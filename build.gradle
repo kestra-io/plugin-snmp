@@ -51,7 +51,7 @@ dependencies {
     compileOnly group: "io.kestra", name: "script", version: kestraVersion
 
     // SNMP
-    api "org.snmp4j:snmp4j:3.9.6"
+    api "org.snmp4j:snmp4j:3.9.7"
 }
 
 
