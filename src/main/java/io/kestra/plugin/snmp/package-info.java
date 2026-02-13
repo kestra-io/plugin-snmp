@@ -1,7 +1,7 @@
 @PluginSubGroup(
     title = "SNMP",
     description = "Tasks to interact with SNMP for network management and monitoring.",
-    categories = { PluginSubGroup.PluginCategory.TOOL, PluginSubGroup.PluginCategory.ALERTING }
+        categories = { PluginSubGroup.PluginCategory.DATA }
 )
 package io.kestra.plugin.snmp;
 
