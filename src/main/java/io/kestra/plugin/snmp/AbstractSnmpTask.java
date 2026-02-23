@@ -28,32 +28,32 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 public abstract class AbstractSnmpTask extends Task {
-    @Schema(title = "Target host", description = "Hostname or IP of the SNMP manager")
+    @Schema(title = "Resolve target host", description = "Hostname or IP of the SNMP manager; defaults to localhost")
     @Builder.Default
     protected Property<String> host = Property.ofValue("localhost");
 
-    @Schema(title = "Target port", description = "UDP port of the SNMP manager (default 162)")
+    @Schema(title = "Set SNMP manager port", description = "UDP port for traps/informs; defaults to 162")
     @Builder.Default
     protected Property<Integer> port = Property.ofValue(162);
 
-    @Schema(title = "SNMP Version", description = "One of v1, v2c, v3")
+    @Schema(title = "Select SNMP version", description = "One of v1, v2c, v3; defaults to v2c")
     @Builder.Default
     protected Property<String> snmpVersion = Property.ofValue("v2c");
 
-    @Schema(title = "Community (v1/v2c)")
+    @Schema(title = "Community string (v1/v2c)", description = "Plaintext community for v1/v2c; ignored for v3")
     protected Property<String> community;
 
-    @Schema(title = "SNMPv3 security settings")
+    @Schema(title = "SNMPv3 security settings", description = "Username and optional auth/privacy protocols required for v3")
     protected Property<V3Security> v3;
 
-    @Schema(title = "Trap OID", description = "Object identifier for the trap type")
+    @Schema(title = "Trap or notification OID", description = "OID for the trap/inform type; required")
     @NotNull
     protected Property<String> trapOid;
 
-    @Schema(title = "Varbinds", description = "List of additional OID/value pairs")
+    @Schema(title = "Additional varbinds", description = "List of extra OID/value pairs appended to the PDU")
     protected Property<List<VarBind>> bindings;
 
-    @Schema(title = "Timeout (ms)", description = "Send timeout for internal operations")
+    @Schema(title = "Timeout (ms)", description = "Transport timeout per send; defaults to 1500 ms")
     @Builder.Default
     protected Property<Integer> timeoutMs = Property.ofValue(1500);
 
@@ -127,19 +127,19 @@ public abstract class AbstractSnmpTask extends Task {
     @AllArgsConstructor
     public static class V3Security {
         @NotBlank
-        @Schema(title = "Username")
+        @Schema(title = "Username", description = "SNMPv3 user name; required when using v3")
         private String username;
 
-        @Schema(title = "Auth protocol", description = "MD5, SHA, SHA224, SHA256, SHA384, SHA512")
+        @Schema(title = "Auth protocol", description = "MD5, SHA, SHA224, SHA256, SHA384, SHA512; blank disables authentication")
         private String authProtocol;
 
-        @Schema(title = "Auth password")
+        @Schema(title = "Auth password", description = "Password for the chosen auth protocol; optional when auth is disabled")
         private String authPassword;
 
-        @Schema(title = "Privacy protocol", description = "DES, AES128, AES192, AES256")
+        @Schema(title = "Privacy protocol", description = "DES, AES128, AES192, AES256; blank disables encryption")
         private String privProtocol;
 
-        @Schema(title = "Privacy password")
+        @Schema(title = "Privacy password", description = "Password for the chosen privacy protocol; optional when privacy is disabled")
         private String privPassword;
     }
 }

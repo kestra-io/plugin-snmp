@@ -24,8 +24,8 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Send an SNMP trap (event)",
-    description = "Constructs and sends an SNMP v1/v2c/v3 trap to a manager (host:port)."
+    title = "Send SNMP trap to manager",
+    description = "Builds and sends an SNMP v1/v2c/v3 trap to the configured host:port. Renders properties with the run context; defaults to localhost:162, version v2c, community public. v1/v2c use plaintext communities—use v3 to add authentication and privacy."
 )
 @Plugin(
     examples = {
