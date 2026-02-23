@@ -25,8 +25,8 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Send an SNMP Inform (acknowledged notification)",
-    description = "Constructs and sends an SNMP v2c/v3 INFORM to a manager (host:port). Unlike traps, informs expect an acknowledgment from the manager."
+    title = "Send SNMP INFORM with acknowledgment",
+    description = "Sends an SNMP v2c/v3 INFORM to the target host:port and waits for acknowledgment. Renders properties before sending; defaults to localhost:162, version v2c, community public, 1500 ms timeout, and one retry. v1/v2c use plaintext communities—prefer v3 when authentication or privacy is required."
 )
 @Plugin(
     examples = {
@@ -54,8 +54,8 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 )
 public class SendInform extends AbstractSnmpTask implements RunnableTask<SendInform.Output> {
     @Schema(
-        title = "Number of retries if no response is received",
-        description = "How many times to retry before giving up."
+        title = "Retry attempts before failing",
+        description = "Resend count when no acknowledgment is received; defaults to 1"
     )
     @Builder.Default
     protected Property<Integer> retries = Property.ofValue(1);
@@ -143,17 +143,20 @@ public class SendInform extends AbstractSnmpTask implements RunnableTask<SendInf
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
         @Schema(
-            title = "Whether the INFORM was acknowledged by the SNMP manager"
+            title = "Acknowledged",
+            description = "True if the manager returned an INFORM response without error"
         )
         private final boolean acknowledged;
 
         @Schema(
-            title = "Error text if the INFORM was not acknowledged"
+            title = "Error text",
+            description = "SNMP error status when the INFORM failed or was not acknowledged"
         )
         private final String error;
 
         @Schema(
-            title = "SNMP response"
+            title = "SNMP response",
+            description = "Raw response payload from the manager, when available"
         )
         private final String responseText;
     }
