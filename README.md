@@ -36,9 +36,9 @@
 <p align="center" style="color:grey;"><i>Get started with Kestra in 4 minutes.</i></p>
 
 
-# Kestra Plugin Template
+# Kestra SNMP Plugin
 
-> A template for creating Kestra plugins
+> Interact with network devices using [SNMP](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol) from your Kestra workflows. Monitor and manage network infrastructure as part of your orchestrated operations.
 
 ![Kestra orchestrator](https://kestra.io/video.gif)
 
