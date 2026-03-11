@@ -1,9 +1,8 @@
 package io.kestra.plugin.snmp;
 
-import io.kestra.core.exceptions.IllegalVariableEvaluationException;
-import io.kestra.core.runners.RunContext;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.Arrays;
+import java.util.List;
+
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.ScopedPDU;
@@ -25,15 +24,19 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Variable;
 import org.snmp4j.smi.VariableBinding;
 
-import java.util.Arrays;
-import java.util.List;
+import io.kestra.core.exceptions.IllegalVariableEvaluationException;
+import io.kestra.core.runners.RunContext;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
 public enum SnmpVersion {
     V1(SnmpConstants.version1) {
         @Override
-        public Built build(RunContext runContext, Address addr, int timeout, String trapOid, List<AbstractSnmpTask.VarBind> bindings, AbstractSnmpTask.V3Security sec, String community, Snmp snmp) throws IllegalVariableEvaluationException {
+        public Built build(RunContext runContext, Address addr, int timeout, String trapOid, List<AbstractSnmpTask.VarBind> bindings, AbstractSnmpTask.V3Security sec, String community,
+            Snmp snmp) throws IllegalVariableEvaluationException {
             PDU pdu = new PDU();
             pdu.setType(PDU.TRAP);
             addBindings(runContext, pdu, bindings);
@@ -50,7 +53,8 @@ public enum SnmpVersion {
     },
     V2C(SnmpConstants.version2c) {
         @Override
-        public Built build(RunContext runContext, Address addr, int timeout, String trapOid, List<AbstractSnmpTask.VarBind> bindings, AbstractSnmpTask.V3Security sec, String community, Snmp snmp) throws IllegalVariableEvaluationException {
+        public Built build(RunContext runContext, Address addr, int timeout, String trapOid, List<AbstractSnmpTask.VarBind> bindings, AbstractSnmpTask.V3Security sec, String community,
+            Snmp snmp) throws IllegalVariableEvaluationException {
             PDU pdu = new PDU();
             pdu.setType(PDU.TRAP);
             addBindings(runContext, pdu, bindings);
@@ -68,8 +72,10 @@ public enum SnmpVersion {
     },
     V3(SnmpConstants.version3) {
         @Override
-        public Built build(RunContext runContext, Address addr, int timeout, String trapOid, List<AbstractSnmpTask.VarBind> bindings, AbstractSnmpTask.V3Security sec, String community, Snmp snmp) throws IllegalVariableEvaluationException {
-            if (sec == null) throw new IllegalArgumentException("v3 settings required");
+        public Built build(RunContext runContext, Address addr, int timeout, String trapOid, List<AbstractSnmpTask.VarBind> bindings, AbstractSnmpTask.V3Security sec, String community,
+            Snmp snmp) throws IllegalVariableEvaluationException {
+            if (sec == null)
+                throw new IllegalArgumentException("v3 settings required");
 
             USM usm = new USM(SecurityProtocols.getInstance(), new OctetString(MPv3.createLocalEngineID()), 0);
             SecurityModels.getInstance().addSecurityModel(usm);
@@ -77,12 +83,16 @@ public enum SnmpVersion {
             OID authProt = AbstractSnmpTask.AuthProtocol.fromString(sec.getAuthProtocol());
             OID privProt = AbstractSnmpTask.PrivProtocol.fromString(sec.getPrivProtocol());
 
-            snmp.getUSM().addUser(new OctetString(sec.getUsername()),
-                new UsmUser(new OctetString(sec.getUsername()),
+            snmp.getUSM().addUser(
+                new OctetString(sec.getUsername()),
+                new UsmUser(
+                    new OctetString(sec.getUsername()),
                     authProt,
                     sec.getAuthPassword() != null ? new OctetString(sec.getAuthPassword()) : null,
                     privProt,
-                    sec.getPrivPassword() != null ? new OctetString(sec.getPrivPassword()) : null));
+                    sec.getPrivPassword() != null ? new OctetString(sec.getPrivPassword()) : null
+                )
+            );
 
             ScopedPDU pdu = new ScopedPDU();
             pdu.setType(PDU.NOTIFICATION);
@@ -103,7 +113,8 @@ public enum SnmpVersion {
 
     private final int code;
 
-    public abstract Built build(RunContext runContext, Address addr, int timeout, String trapOid, List<AbstractSnmpTask.VarBind> bindings, AbstractSnmpTask.V3Security sec, String community, Snmp snmp) throws IllegalVariableEvaluationException;
+    public abstract Built build(RunContext runContext, Address addr, int timeout, String trapOid, List<AbstractSnmpTask.VarBind> bindings, AbstractSnmpTask.V3Security sec, String community,
+        Snmp snmp) throws IllegalVariableEvaluationException;
 
     public static SnmpVersion fromString(String s) {
         return Arrays.stream(values())
@@ -113,7 +124,8 @@ public enum SnmpVersion {
     }
 
     protected static void addBindings(RunContext runContext, PDU pdu, List<AbstractSnmpTask.VarBind> bindings) throws IllegalVariableEvaluationException {
-        if (bindings == null) return;
+        if (bindings == null)
+            return;
         for (AbstractSnmpTask.VarBind b : bindings) {
             String oid = runContext.render(b.getOid()).as(String.class).orElse(null);
             String value = runContext.render(b.getValue()).as(String.class).orElse(null);
@@ -126,7 +138,8 @@ public enum SnmpVersion {
     }
 
     public static Variable toVariable(String raw) {
-        if (raw == null) return null;
+        if (raw == null)
+            return null;
 
         if (raw.matches("^-?\\d+$")) {
             return new Integer32(Integer.parseInt(raw));
@@ -134,7 +147,8 @@ public enum SnmpVersion {
 
         if (raw.matches("^\\d+$")) {
             long l = Long.parseLong(raw);
-            if (l <= Integer.MAX_VALUE) return new Gauge32((int) l);
+            if (l <= Integer.MAX_VALUE)
+                return new Gauge32((int) l);
             return new Counter64(l);
         }
 

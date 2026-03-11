@@ -1,13 +1,5 @@
 package io.kestra.plugin.snmp;
 
-import io.kestra.core.models.annotations.Example;
-import io.kestra.core.models.annotations.Plugin;
-import io.kestra.core.models.property.Property;
-import io.kestra.core.models.tasks.RunnableTask;
-import io.kestra.core.runners.RunContext;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.snmp4j.*;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.MPv3;
@@ -18,6 +10,16 @@ import org.snmp4j.security.USM;
 import org.snmp4j.security.UsmUser;
 import org.snmp4j.smi.*;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+
+import io.kestra.core.models.annotations.Example;
+import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.property.Property;
+import io.kestra.core.models.tasks.RunnableTask;
+import io.kestra.core.runners.RunContext;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @EqualsAndHashCode
@@ -34,21 +36,21 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
             title = "Send SNMP v2c inform",
             full = true,
             code = """
-                id: snmp-inform-test
-                namespace: monitoring
+                    id: snmp-inform-test
+                    namespace: monitoring
 
-                tasks:
-                  - id: inform
-                    type: io.kestra.plugin.snmp.SendInform
-                    host: "snmp.manager.local"
-                    port: 162
-                    version: "v2c"
-                    community: "public"
-                    trapOid: "1.3.6.1.4.1.8072.2.3.0.1"
-                    bindings:
-                      - oid: "1.3.6.1.2.1.1.3.0"
-                        value: "9999"
-            """
+                    tasks:
+                      - id: inform
+                        type: io.kestra.plugin.snmp.SendInform
+                        host: "snmp.manager.local"
+                        port: 162
+                        version: "v2c"
+                        community: "public"
+                        trapOid: "1.3.6.1.4.1.8072.2.3.0.1"
+                        bindings:
+                          - oid: "1.3.6.1.2.1.1.3.0"
+                            value: "9999"
+                """
         )
     }
 )
@@ -99,19 +101,25 @@ public class SendInform extends AbstractSnmpTask implements RunnableTask<SendInf
                 cTarget.setVersion(SnmpConstants.version2c);
                 target = cTarget;
             } else if (rVersion.equalsIgnoreCase("v3")) {
-                USM usm = new USM(SecurityProtocols.getInstance(),
-                    new OctetString(MPv3.createLocalEngineID()), 0);
+                USM usm = new USM(
+                    SecurityProtocols.getInstance(),
+                    new OctetString(MPv3.createLocalEngineID()), 0
+                );
                 SecurityModels.getInstance().addSecurityModel(usm);
 
                 var v3sec = runContext.render(this.v3).as(AbstractSnmpTask.V3Security.class)
                     .orElseThrow(() -> new IllegalArgumentException("v3 settings required"));
 
-                snmp.getUSM().addUser(new OctetString(v3sec.getUsername()),
-                    new UsmUser(new OctetString(v3sec.getUsername()),
+                snmp.getUSM().addUser(
+                    new OctetString(v3sec.getUsername()),
+                    new UsmUser(
+                        new OctetString(v3sec.getUsername()),
                         AbstractSnmpTask.AuthProtocol.fromString(v3sec.getAuthProtocol()),
                         v3sec.getAuthPassword() != null ? new OctetString(v3sec.getAuthPassword()) : null,
                         AbstractSnmpTask.PrivProtocol.fromString(v3sec.getPrivProtocol()),
-                        v3sec.getPrivPassword() != null ? new OctetString(v3sec.getPrivPassword()) : null));
+                        v3sec.getPrivPassword() != null ? new OctetString(v3sec.getPrivPassword()) : null
+                    )
+                );
 
                 UserTarget uTarget = new UserTarget();
                 uTarget.setAddress(targetAddress);

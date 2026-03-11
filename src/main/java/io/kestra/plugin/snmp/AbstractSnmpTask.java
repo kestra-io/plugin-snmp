@@ -1,13 +1,8 @@
 package io.kestra.plugin.snmp;
 
-import io.kestra.core.models.property.Property;
-import io.kestra.core.models.tasks.Task;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import java.util.Arrays;
+import java.util.List;
 
-import lombok.experimental.SuperBuilder;
 import org.snmp4j.security.AuthHMAC128SHA224;
 import org.snmp4j.security.AuthHMAC192SHA256;
 import org.snmp4j.security.AuthHMAC256SHA384;
@@ -21,8 +16,14 @@ import org.snmp4j.security.PrivDES;
 import org.snmp4j.security.SecurityLevel;
 import org.snmp4j.smi.OID;
 
-import java.util.Arrays;
-import java.util.List;
+import io.kestra.core.models.property.Property;
+import io.kestra.core.models.tasks.Task;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @NoArgsConstructor
@@ -60,8 +61,10 @@ public abstract class AbstractSnmpTask extends Task {
     public static int toSecLevel(AbstractSnmpTask.V3Security sec) {
         boolean auth = sec.getAuthProtocol() != null && !sec.getAuthProtocol().isBlank();
         boolean priv = sec.getPrivProtocol() != null && !sec.getPrivProtocol().isBlank();
-        if (auth && priv) return SecurityLevel.AUTH_PRIV;
-        if (auth) return SecurityLevel.AUTH_NOPRIV;
+        if (auth && priv)
+            return SecurityLevel.AUTH_PRIV;
+        if (auth)
+            return SecurityLevel.AUTH_NOPRIV;
         return SecurityLevel.NOAUTH_NOPRIV;
     }
 
@@ -78,7 +81,8 @@ public abstract class AbstractSnmpTask extends Task {
         private final OID oid;
 
         public static OID fromString(String name) {
-            if (name == null) return null;
+            if (name == null)
+                return null;
             return Arrays.stream(values())
                 .filter(p -> p.name().equalsIgnoreCase(name))
                 .map(AuthProtocol::getOid)
@@ -98,7 +102,8 @@ public abstract class AbstractSnmpTask extends Task {
         private final OID oid;
 
         public static OID fromString(String name) {
-            if (name == null) return null;
+            if (name == null)
+                return null;
             return Arrays.stream(values())
                 .filter(p -> p.name().equalsIgnoreCase(name))
                 .map(PrivProtocol::getOid)

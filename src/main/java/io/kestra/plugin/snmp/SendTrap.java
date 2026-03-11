@@ -1,22 +1,19 @@
 package io.kestra.plugin.snmp;
 
-import io.kestra.core.models.annotations.Example;
-import io.kestra.core.models.annotations.Plugin;
-import io.kestra.core.models.property.Property;
-import io.kestra.core.models.tasks.RunnableTask;
-import io.kestra.core.models.tasks.VoidOutput;
-import io.kestra.core.runners.RunContext;
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
 import org.snmp4j.*;
 import org.snmp4j.security.*;
 import org.snmp4j.smi.*;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
-import java.util.Arrays;
-import java.util.List;
+import io.kestra.core.models.annotations.Example;
+import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.tasks.RunnableTask;
+import io.kestra.core.models.tasks.VoidOutput;
+import io.kestra.core.runners.RunContext;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @EqualsAndHashCode
@@ -33,29 +30,29 @@ import java.util.List;
             title = "Send SNMP v2c trap on error",
             full = true,
             code = """
-                id: snmp-trap-on-failure
-                namespace: monitoring
+                    id: snmp-trap-on-failure
+                    namespace: monitoring
 
-                tasks:
-                  - id: risky
-                    type: io.kestra.plugin.scripts.shell.Commands
-                    commands:
-                      - 'exit 1'
+                    tasks:
+                      - id: risky
+                        type: io.kestra.plugin.scripts.shell.Commands
+                        commands:
+                          - 'exit 1'
 
-                errors:
-                  - id: send-trap
-                    type: io.kestra.plugin.snmp.SendTrap
-                    host: "snmp.manager.local"
-                    port: 162
-                    snmpVersion: "v2c"
-                    community: "public"
-                    trapOid: "1.3.6.1.4.1.8072.2.3.0.1"
-                    bindings:
-                      - oid: "1.3.6.1.2.1.1.3.0"
-                        value: "12345"
-                      - oid: "1.3.6.1.4.1.8072.2.3.2.1"
-                        value: "FAILED"
-            """
+                    errors:
+                      - id: send-trap
+                        type: io.kestra.plugin.snmp.SendTrap
+                        host: "snmp.manager.local"
+                        port: 162
+                        snmpVersion: "v2c"
+                        community: "public"
+                        trapOid: "1.3.6.1.4.1.8072.2.3.0.1"
+                        bindings:
+                          - oid: "1.3.6.1.2.1.1.3.0"
+                            value: "12345"
+                          - oid: "1.3.6.1.4.1.8072.2.3.2.1"
+                            value: "FAILED"
+                """
         )
     }
 )
@@ -84,7 +81,8 @@ public class SendTrap extends AbstractSnmpTask implements RunnableTask<VoidOutpu
                 snmp
             );
 
-            snmp.send(built.getPdu(), built.getTarget());;
+            snmp.send(built.getPdu(), built.getTarget());
+            ;
 
             runContext.logger().info("SNMP trap sent to {}:{}", rHost, rPort);
 
