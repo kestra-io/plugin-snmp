@@ -20,6 +20,7 @@ import io.kestra.core.runners.RunContext;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @EqualsAndHashCode
@@ -60,6 +61,7 @@ public class SendInform extends AbstractSnmpTask implements RunnableTask<SendInf
         description = "Resend count when no acknowledgment is received; defaults to 1"
     )
     @Builder.Default
+    @PluginProperty(group = "advanced")
     protected Property<Integer> retries = Property.ofValue(1);
 
     @Override

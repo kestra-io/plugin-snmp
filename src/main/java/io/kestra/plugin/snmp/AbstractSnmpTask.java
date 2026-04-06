@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @Getter
 @NoArgsConstructor
@@ -31,31 +32,39 @@ import lombok.experimental.SuperBuilder;
 public abstract class AbstractSnmpTask extends Task {
     @Schema(title = "Resolve target host", description = "Hostname or IP of the SNMP manager; defaults to localhost")
     @Builder.Default
+    @PluginProperty(group = "connection")
     protected Property<String> host = Property.ofValue("localhost");
 
     @Schema(title = "Set SNMP manager port", description = "UDP port for traps/informs; defaults to 162")
     @Builder.Default
+    @PluginProperty(group = "connection")
     protected Property<Integer> port = Property.ofValue(162);
 
     @Schema(title = "Select SNMP version", description = "One of v1, v2c, v3; defaults to v2c")
     @Builder.Default
+    @PluginProperty(group = "advanced")
     protected Property<String> snmpVersion = Property.ofValue("v2c");
 
     @Schema(title = "Community string (v1/v2c)", description = "Plaintext community for v1/v2c; ignored for v3")
+    @PluginProperty(group = "advanced")
     protected Property<String> community;
 
     @Schema(title = "SNMPv3 security settings", description = "Username and optional auth/privacy protocols required for v3")
+    @PluginProperty(group = "advanced")
     protected Property<V3Security> v3;
 
     @Schema(title = "Trap or notification OID", description = "OID for the trap/inform type; required")
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> trapOid;
 
     @Schema(title = "Additional varbinds", description = "List of extra OID/value pairs appended to the PDU")
+    @PluginProperty(group = "advanced")
     protected Property<List<VarBind>> bindings;
 
     @Schema(title = "Timeout (ms)", description = "Transport timeout per send; defaults to 1500 ms")
     @Builder.Default
+    @PluginProperty(group = "advanced")
     protected Property<Integer> timeoutMs = Property.ofValue(1500);
 
     public static int toSecLevel(AbstractSnmpTask.V3Security sec) {
@@ -119,10 +128,12 @@ public abstract class AbstractSnmpTask extends Task {
     public static class VarBind {
         @NotBlank
         @Schema(title = "OID", description = "OID of the variable binding (e.g. 1.3.6.1.2.1.1.3.0)")
+        @PluginProperty(group = "advanced")
         private Property<String> oid;
 
         @NotNull
         @Schema(title = "Value", description = "String value to send for this OID")
+        @PluginProperty(group = "main")
         private Property<String> value;
     }
 
@@ -133,18 +144,23 @@ public abstract class AbstractSnmpTask extends Task {
     public static class V3Security {
         @NotBlank
         @Schema(title = "Username", description = "SNMPv3 user name; required when using v3")
+        @PluginProperty(group = "connection")
         private String username;
 
         @Schema(title = "Auth protocol", description = "MD5, SHA, SHA224, SHA256, SHA384, SHA512; blank disables authentication")
+        @PluginProperty(group = "connection")
         private String authProtocol;
 
         @Schema(title = "Auth password", description = "Password for the chosen auth protocol; optional when auth is disabled")
+        @PluginProperty(group = "connection")
         private String authPassword;
 
         @Schema(title = "Privacy protocol", description = "DES, AES128, AES192, AES256; blank disables encryption")
+        @PluginProperty(group = "advanced")
         private String privProtocol;
 
         @Schema(title = "Privacy password", description = "Password for the chosen privacy protocol; optional when privacy is disabled")
+        @PluginProperty(group = "connection")
         private String privPassword;
     }
 }
