@@ -144,7 +144,7 @@ public abstract class AbstractSnmpTask extends Task {
     public static class V3Security {
         @NotBlank
         @Schema(title = "Username", description = "SNMPv3 user name; required when using v3")
-        @PluginProperty(group = "connection")
+        @PluginProperty(secret = true, group = "connection")
         private String username;
 
         @Schema(title = "Auth protocol", description = "MD5, SHA, SHA224, SHA256, SHA384, SHA512; blank disables authentication")
@@ -152,7 +152,7 @@ public abstract class AbstractSnmpTask extends Task {
         private String authProtocol;
 
         @Schema(title = "Auth password", description = "Password for the chosen auth protocol; optional when auth is disabled")
-        @PluginProperty(group = "connection")
+        @PluginProperty(secret = true, group = "connection")
         private String authPassword;
 
         @Schema(title = "Privacy protocol", description = "DES, AES128, AES192, AES256; blank disables encryption")
@@ -160,7 +160,7 @@ public abstract class AbstractSnmpTask extends Task {
         private String privProtocol;
 
         @Schema(title = "Privacy password", description = "Password for the chosen privacy protocol; optional when privacy is disabled")
-        @PluginProperty(group = "connection")
+        @PluginProperty(secret = true, group = "connection")
         private String privPassword;
     }
 }
