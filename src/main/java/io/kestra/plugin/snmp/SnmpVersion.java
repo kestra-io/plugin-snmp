@@ -83,6 +83,15 @@ public enum SnmpVersion {
             OID authProt = AbstractSnmpTask.AuthProtocol.fromString(sec.getAuthProtocol());
             OID privProt = AbstractSnmpTask.PrivProtocol.fromString(sec.getPrivProtocol());
 
+            if (sec.getAuthProtocol() != null && !sec.getAuthProtocol().isBlank()
+                && AbstractSnmpTask.AuthProtocol.fromStringEnum(sec.getAuthProtocol()).isWeak()) {
+                runContext.logger().warn("SNMPv3 auth protocol '{}' is cryptographically weak and deprecated; prefer SHA256 or higher.", sec.getAuthProtocol());
+            }
+            if (sec.getPrivProtocol() != null && !sec.getPrivProtocol().isBlank()
+                && AbstractSnmpTask.PrivProtocol.fromStringEnum(sec.getPrivProtocol()).isWeak()) {
+                runContext.logger().warn("SNMPv3 privacy protocol '{}' is cryptographically weak and deprecated; prefer AES128 or higher.", sec.getPrivProtocol());
+            }
+
             snmp.getUSM().addUser(
                 new OctetString(sec.getUsername()),
                 new UsmUser(
