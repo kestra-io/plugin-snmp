@@ -46,7 +46,8 @@ public abstract class AbstractSnmpTask extends Task {
     protected Property<String> snmpVersion = Property.ofValue("v2c");
 
     @Schema(title = "Community string (v1/v2c)", description = "Plaintext community for v1/v2c; ignored for v3")
-    @PluginProperty(group = "advanced")
+    @PluginProperty(secret = true, group = "advanced")
+    @ToString.Exclude
     protected Property<String> community;
 
     @Schema(title = "SNMPv3 security settings", description = "Username and optional auth/privacy protocols required for v3")
@@ -80,7 +81,19 @@ public abstract class AbstractSnmpTask extends Task {
     @Getter
     @AllArgsConstructor
     public enum AuthProtocol {
+        /**
+         * @deprecated MD5 is cryptographically broken (CWE-327) and should not be used for new
+         * configurations. Retained only for compatibility with legacy devices that support no
+         * stronger algorithm. Prefer SHA256 or higher.
+         */
+        @Deprecated
         MD5(AuthMD5.ID),
+        /**
+         * @deprecated SHA-1 is considered weak (CWE-327) and should not be used for new
+         * configurations. Retained only for compatibility with legacy devices that support no
+         * stronger algorithm. Prefer SHA256 or higher.
+         */
+        @Deprecated
         SHA(AuthSHA.ID),
         SHA224(AuthHMAC128SHA224.ID),
         SHA256(AuthHMAC192SHA256.ID),
@@ -98,11 +111,28 @@ public abstract class AbstractSnmpTask extends Task {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported auth protocol: " + name));
         }
+
+        public static AuthProtocol fromStringEnum(String name) {
+            return Arrays.stream(values())
+                .filter(p -> p.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported auth protocol: " + name));
+        }
+
+        public boolean isWeak() {
+            return this == MD5 || this == SHA;
+        }
     }
 
     @Getter
     @AllArgsConstructor
     public enum PrivProtocol {
+        /**
+         * @deprecated DES is cryptographically broken (CWE-327, 56-bit key) and should not be used
+         * for new configurations. Retained only for compatibility with legacy devices that support
+         * no stronger algorithm. Prefer AES128 or higher.
+         */
+        @Deprecated
         DES(PrivDES.ID),
         AES128(PrivAES128.ID),
         AES192(PrivAES192.ID),
@@ -118,6 +148,17 @@ public abstract class AbstractSnmpTask extends Task {
                 .map(PrivProtocol::getOid)
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unsupported privacy protocol: " + name));
+        }
+
+        public static PrivProtocol fromStringEnum(String name) {
+            return Arrays.stream(values())
+                .filter(p -> p.name().equalsIgnoreCase(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unsupported privacy protocol: " + name));
+        }
+
+        public boolean isWeak() {
+            return this == DES;
         }
     }
 
@@ -147,7 +188,7 @@ public abstract class AbstractSnmpTask extends Task {
         @PluginProperty(secret = true, group = "connection")
         private String username;
 
-        @Schema(title = "Auth protocol", description = "MD5, SHA, SHA224, SHA256, SHA384, SHA512; blank disables authentication")
+        @Schema(title = "Auth protocol", description = "MD5, SHA, SHA224, SHA256, SHA384, SHA512; blank disables authentication. MD5 and SHA (SHA-1) are cryptographically weak and deprecated; prefer SHA256 or higher.")
         @PluginProperty(group = "connection")
         private String authProtocol;
 
@@ -155,7 +196,7 @@ public abstract class AbstractSnmpTask extends Task {
         @PluginProperty(secret = true, group = "connection")
         private String authPassword;
 
-        @Schema(title = "Privacy protocol", description = "DES, AES128, AES192, AES256; blank disables encryption")
+        @Schema(title = "Privacy protocol", description = "DES, AES128, AES192, AES256; blank disables encryption. DES is cryptographically weak and deprecated; prefer AES128 or higher.")
         @PluginProperty(group = "advanced")
         private String privProtocol;
 
