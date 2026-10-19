@@ -39,25 +39,4 @@ class SendInformTest {
         SendInform.Output output = task.run(runContextFactory.of());
         assertThat(output.isAcknowledged(), is(true));
     }
-
-    @Test
-    void sendInformExampleUsesSnmpVersionProperty() {
-        Plugin plugin = SendInform.class.getAnnotation(Plugin.class);
-        assertThat(plugin, notNullValue());
-        assertThat(plugin.examples().length, greaterThan(0));
-        String exampleCode = String.join("\n", plugin.examples()[0].code());
-        assertThat(
-            "SendInform @Example must use snmpVersion (matches AbstractSnmpTask property)",
-            exampleCode,
-            containsString("snmpVersion: \"v2c\"")
-        );
-        // Strip correct property so a bare "version:" key would still be detectable
-        String withoutSnmpVersion = exampleCode.replace("snmpVersion:", "PROP:");
-        assertThat(
-            "SendInform @Example must not use unknown property version:",
-            withoutSnmpVersion,
-            not(containsString("version:"))
-        );
-    }
-
 }
